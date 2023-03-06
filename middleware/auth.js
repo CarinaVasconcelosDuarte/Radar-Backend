@@ -1,20 +1,49 @@
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
+const _user = require("../models/user");
 
-const dotenv = require('dotenv');
+
 
 let checkToken = (req, res, next)  => {
-  const authHeader = req.headers['authorization']
-  const token = authHeader && authHeader.split(' ')[1]
+  const authHeader = req.headers['x-access-token'];
 
-  if (token == null) return res.sendStatus(401)
+  if (!authHeader) {
+    return res.status(403).send({ message : "Token is missing" });
+  }
 
-  jwt.verify(token, process.env.TOKEN_SECRET, (err , decoded) => {
-    if (err) return res.sendStatus(403).send('Token is not valid');
-    req.decoded = decoded;
+  jwt.verify(authHeader, process.env.ACCESS_TOKEN_SECRET, (err , decoded) => {
+    if (err) return res.status(401).send({ message : "Token is not valid" });
+    req.userId = decoded.id;
+    console.log("decoded id:", decoded.id)
     next();
   })
 };
 
-module.exports = {
-    checkToken: checkToken
-};
+isAdmin = (req, res, next) => {
+  console.log(req.userId);
+
+  _user.findOne({_id: req.userId, admin : true })
+      .then(data => {
+        console.log("data after isAdmin",data)
+        if(!data){
+          return res.status(403)
+          .send({ message : "No administrator rights for this user" });
+        }
+        next();
+        return;
+        
+      })
+      .catch(error => {
+          console.log(error)
+          res.status(500).send({
+              message: error.message
+          })
+      });
+}
+
+const AuthToken = {
+  checkToken,
+  isAdmin
+}
+
+module.exports = AuthToken

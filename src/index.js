@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
-mongoose.set('strictQuery', false); // TODO: Remove later maybe
+mongoose.set('strictQuery', false);
 
 const PASS = process.env.DB_PASSWORD;
 const conn = `mongodb+srv://mod:${PASS}@tech-radar.ihdq6st.mongodb.net/techRadar?retryWrites=true&w=majority`;

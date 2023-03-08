@@ -96,7 +96,6 @@ router.post("/technologies", [checkToken, isAdmin] , (req, res) => {
         return res.status(400).send({ message: "A name is required!" });
     }
 
-    console.log(req);
     const technology = new _technology({
         name : req.body.name,
         category : req.body.category,
@@ -127,8 +126,6 @@ router.put("/technologies/:id", [checkToken, isAdmin] , async (req, res) => {
     const user = await _user.findOne({
         _id: req.userId,
     });
-
-    console.log(user.username);
     
     const technology = await _technology.findOneAndUpdate({ _id: req.params.id}, req.body, {new: true});
     technology.history.push({name: user.username, changedBy: req.userId, updatedAt: Date.now()});
@@ -138,7 +135,6 @@ router.put("/technologies/:id", [checkToken, isAdmin] , async (req, res) => {
             res.status(404).send({ message: "No Technology found" });
         }else {
             res.send(data);
-            console.log('Updated sucessfully');
         }
     })
     .catch(error => {

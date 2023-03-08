@@ -14,17 +14,14 @@ let checkToken = (req, res, next)  => {
   jwt.verify(authHeader, process.env.ACCESS_TOKEN_SECRET, (err , decoded) => {
     if (err) return res.status(401).send({ message : "Token is not valid" });
     req.userId = decoded.id;
-    console.log("decoded id:", decoded.id)
     next();
   })
 };
 
 isAdmin = (req, res, next) => {
-  console.log(req.userId);
 
   _user.findOne({_id: req.userId, admin : true })
       .then(data => {
-        console.log("data after isAdmin",data)
         if(!data){
           return res.status(403)
           .send({ message : "No administrator rights for this user" });
@@ -34,7 +31,6 @@ isAdmin = (req, res, next) => {
         
       })
       .catch(error => {
-          console.log(error)
           res.status(500).send({
               message: error.message
           })
